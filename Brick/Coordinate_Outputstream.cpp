@@ -210,22 +210,49 @@ void C_screen::Show_opt(){//화면 최적화 출력.
 	//2바이트 출력에러 방지코드.
 	gotoxy(0, Height);
 	printf_s(" ");
-	if (Rec_num < Length*Height){//화면 변경 기록 사용 경우.
-		for (Temp1 = 0; Temp1 < (int)Rec_num; Temp1++){
-			if (Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]){//다를때.
-				gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
-				printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]);//출력.
-				Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
+	if (Rec_num < Length*Height) {//화면 변경 기록 사용 경우.
+		for (Temp1 = 0; Temp1 < (int)Rec_num; Temp1++) {
+			if (Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X] & 0x80) {//2바이트 문자의 경우.
+				if (Input_rec[Temp1].X + 1 == Input_rec[Temp1 + 1].X) {//거짓일 경우 오류, 출력 생략.
+					if ((Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]) ||
+						(Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1])) {//다를때.
+
+						gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
+						printf_s("%c%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X], Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]);//출력.
+						Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
+						Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1];
+						Temp1++;//2바이트 문자이므로 화면 변경 기록도 2번 사용함.
+					}
+				}
+			}
+			else {//1바이트 문자의 경우.
+				if ((Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X])) {//다를때.
+					gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
+					printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]);//출력.
+					Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
+				}
 			}
 		}
 	}
 	else {
-		for (Temp1 = 0; Temp1 < (int)Height; Temp1++){
-			for (Temp2 = 0; Temp2 < (int)Length; Temp2++){
-				if (Screen_buf[Temp1][Temp2] != Screen[Temp1][Temp2]){//다를때.
-					gotoxy(Temp2, Temp1);
-					printf_s("%c", Screen[Temp1][Temp2]);//출력.
-					Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
+		for (Temp1 = 0; Temp1 < (int)Height; Temp1++) {
+			for (Temp2 = 0; Temp2 < (int)Length; Temp2++) {
+				if (Screen[Temp1][Temp2] & 0x80) {//2바이트 문자의 경우.
+					if ((Screen_buf[Temp1][Temp2] != Screen[Temp1][Temp2]) ||
+						(Screen_buf[Temp1][Temp2 + 1] != Screen[Temp1][Temp2 + 1])) {//다를때.
+						gotoxy(Temp2, Temp1);
+						printf_s("%c%c", Screen[Temp1][Temp2], Screen[Temp1][Temp2 + 1]);//출력.
+						Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
+						Screen_buf[Temp1][Temp2 + 1] = Screen[Temp1][Temp2 + 1];
+					}
+					Temp2++;//2바이트 문자이므로.
+				}
+				else {//1바이트 문자의 경우.
+					if ((Screen_buf[Temp1][Temp2] != Screen[Temp1][Temp2])) {//다를때.
+						gotoxy(Temp2, Temp1);
+						printf_s("%c", Screen[Temp1][Temp2]);//출력.
+						Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
+					}
 				}
 			}
 		}
@@ -244,8 +271,7 @@ void C_screen::Show_opt_kr(){//화면 최적화 출력(2바이트 문자용)(1�
 				if ((Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]) ||
 					(Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1])){//다를때.
 					gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
-					printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]);//출력.
-					printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]);
+					printf_s("%c%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X], Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]);//출력.
 					Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
 					Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1];//저장.
 				}
@@ -546,11 +572,20 @@ void C_screen_color::Show(){
 			Screen_col_buf[Temp1][Temp2] = Screen_col[Temp1][Temp2];
 		}
 	}
+	//화면 출력.
 	for (Temp1 = 0; Temp1 < (int)Height; Temp1++){
-		gotoxy(0, Temp1);
 		for (Temp2 = 0; Temp2 < (int)Length; Temp2++){
 			SetConsoleTextAttribute(H, Screen_col[Temp1][Temp2] & 0xff);
-			printf_s("%c", Screen[Temp1][Temp2]);
+			gotoxy(Temp2, Temp1);
+			if (Screen[Temp1][Temp2] & 0x80) {//2바이트 문자의 경우.
+				printf_s("  ");
+				gotoxy(Temp2, Temp1);
+				printf_s("%c%c", Screen[Temp1][Temp2], Screen[Temp1][Temp2 + 1]);
+				Temp2++;
+			}
+			else {//1바이트 문자의 경우.
+				printf_s("%c", Screen[Temp1][Temp2]);
+			}
 		}
 	}
 	Rec_num = 0;
@@ -563,26 +598,67 @@ void C_screen_color::Show_opt(){
 	printf_s(" ");
 	if (Rec_num < Length*Height){//화면 변경 기록 사용 경우.
 		for (Temp1 = 0; Temp1 < (int)Rec_num; Temp1++){
-			if ((Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]) ||
-				(Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X])){//다를때.
-				gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
-				SetConsoleTextAttribute(H, Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X] & 0xff);
-				printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]);//출력.
-				Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
-				Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X];
+			if (Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X] & 0x80) {//2바이트 문자의 경우.
+				if (Input_rec[Temp1].X + 1 == Input_rec[Temp1 + 1].X) {//거짓일 경우 오류, 출력 생략.
+					if ((Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]) ||
+						(Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]) ||
+						(Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X]) ||
+						(Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] != Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1])) {//다를때.
+
+						gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
+						SetConsoleTextAttribute(H, Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X] & 0xff);
+						printf_s("  ");
+						gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
+						printf_s("%c%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X], Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]);//출력.
+						Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
+						Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1];
+						Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X];
+						Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] = Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1];
+						Temp1++;//2바이트 문자이므로 화면 변경 기록도 2번 사용함.
+					}
+				}
+			}
+			else {//1바이트 문자의 경우.
+				if ((Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]) ||
+					(Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] != Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X])) {//다를때.
+					gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
+					SetConsoleTextAttribute(H, Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X] & 0xff);
+					printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]);//출력.
+					Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
+					Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X];
+				}
 			}
 		}
 	}
-	else {
+	else {//화면 변경 기록 미사용.
 		for (Temp1 = 0; Temp1 < (int)Height; Temp1++){
 			for (Temp2 = 0; Temp2 < (int)Length; Temp2++){
-				if ((Screen_buf[Temp1][Temp2] != Screen[Temp1][Temp2]) ||
-					(Screen_col_buf[Temp1][Temp2] != Screen_col[Temp1][Temp2])){//다를때.
-					gotoxy(Temp2, Temp1);//출력.
-					SetConsoleTextAttribute(H, Screen_col[Temp1][Temp2] & 0xff);
-					printf_s("%c", Screen[Temp1][Temp2]);//출력.
-					Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
-					Screen_col_buf[Temp1][Temp2] = Screen_col[Temp1][Temp2];
+				if (Screen[Temp1][Temp2] & 0x80) {//2바이트 문자의 경우.
+					if ((Screen_buf[Temp1][Temp2] != Screen[Temp1][Temp2]) ||
+						(Screen_buf[Temp1][Temp2 + 1] != Screen[Temp1][Temp2 + 1]) ||
+						(Screen_col_buf[Temp1][Temp2] != Screen_col[Temp1][Temp2]) ||
+						(Screen_col_buf[Temp1][Temp2 + 1] != Screen_col[Temp1][Temp2 + 1])) {//다를때.
+						gotoxy(Temp2, Temp1);
+						SetConsoleTextAttribute(H, Screen_col[Temp1][Temp2] & 0xff);
+						printf_s("  ");
+						gotoxy(Temp2, Temp1);
+						printf_s("%c%c", Screen[Temp1][Temp2], Screen[Temp1][Temp2 + 1]);//출력.
+						Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
+						Screen_buf[Temp1][Temp2 + 1] = Screen[Temp1][Temp2 + 1];
+						Screen_col_buf[Temp1][Temp2] = Screen_col[Temp1][Temp2];
+						Screen_col_buf[Temp1][Temp2 + 1] = Screen_col[Temp1][Temp2 + 1];
+					}
+					Temp2++;//2바이트 문자이므로.
+				}
+				else {//1바이트 문자의 경우.
+					if ((Screen_buf[Temp1][Temp2] != Screen[Temp1][Temp2]) ||
+						(Screen_col_buf[Temp1][Temp2] != Screen_col[Temp1][Temp2])) {//다를때.
+						gotoxy(Temp2, Temp1);
+						SetConsoleTextAttribute(H, Screen_col[Temp1][Temp2] & 0xff);
+						printf_s("%c", Screen[Temp1][Temp2]);//출력.
+						Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
+						Screen_col_buf[Temp1][Temp2] = Screen_col[Temp1][Temp2];
+					}
 				}
 			}
 		}
@@ -605,8 +681,9 @@ void C_screen_color::Show_opt_kr(){
 					(Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] != Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1])){//다를때.
 					gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
 					SetConsoleTextAttribute(H, Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X] & 0xff);
-					printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X]);//출력.
-					printf_s("%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]);
+					printf_s("  ");
+					gotoxy(Input_rec[Temp1].X, Input_rec[Temp1].Y);
+					printf_s("%c%c", Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X], Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1]);//출력.
 					Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
 					Screen_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1] = Screen[Input_rec[Temp1].Y][Input_rec[Temp1].X + 1];//저장.
 					Screen_col_buf[Input_rec[Temp1].Y][Input_rec[Temp1].X] = Screen_col[Input_rec[Temp1].Y][Input_rec[Temp1].X];//저장.
@@ -638,6 +715,8 @@ void C_screen_color::Show_opt_kr(){
 						(Screen_col_buf[Temp1][Temp2 + 1] != Screen_col[Temp1][Temp2 + 1])){//다를때.
 						gotoxy(Temp2, Temp1);
 						SetConsoleTextAttribute(H, Screen_col[Temp1][Temp2] & 0xff);
+						printf_s("  ");
+						gotoxy(Temp2, Temp1);
 						printf_s("%c%c", Screen[Temp1][Temp2], Screen[Temp1][Temp2 + 1]);//출력.
 						Screen_buf[Temp1][Temp2] = Screen[Temp1][Temp2];//저장.
 						Screen_buf[Temp1][Temp2 + 1] = Screen[Temp1][Temp2 + 1];//저장.
@@ -676,6 +755,8 @@ void C_screen_color::Show_opt_kr(unsigned Time){
 				(Screen_col_buf[Y][X + 1] != Screen_col[Y][X + 1])){//다를때.
 				gotoxy(X, Y);
 				SetConsoleTextAttribute(H, Screen_col[Y][X] & 0xff);
+				printf_s("  ");
+				gotoxy(X, Y);
 				printf_s("%c%c", Screen[Y][X], Screen[Y][X + 1]);//출력.
 				Screen_buf[Y][X] = Screen[Y][X];//저장.
 				Screen_buf[Y][X + 1] = Screen[Y][X + 1];//저장.

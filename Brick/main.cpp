@@ -397,10 +397,10 @@ void C_board::Game_init() {
 	Board[BRICK_HEIGHT][BRICK_HEIGHT - 1].Health = 2;
 	Board[BOARD_SIZE - BRICK_HEIGHT - 1][BOARD_SIZE - BRICK_HEIGHT].Health = 2;
 	//일부 특수블럭 생성.
-	Brick_add_wall(T_direction::L);
 	Special_brick = Brick_shape_list.Get_shape().Rotate(random(4));
-	for (Temp1 = 0; Temp1 < Special_brick.Get_X_size(); Temp1++) {
-		for (Temp2 = 0; Temp2 < Special_brick.Get_Y_size(); Temp2++) {
+	ID_table[1] = ID_table[2] = ID_table[3] = true;
+	for (Temp1 = 0; Temp1 < (int)Special_brick.Get_X_size(); Temp1++) {
+		for (Temp2 = 0; Temp2 < (int)Special_brick.Get_Y_size(); Temp2++) {
 			if (Special_brick.Read(Temp1, Temp2)) {
 				Board[BOARD_SIZE / 2 - Temp2][BOARD_SIZE - 1 - Temp1].Health = 5;
 				Board[BOARD_SIZE / 2 - Temp2][BOARD_SIZE - 1 - Temp1].ID = 1;
@@ -409,8 +409,8 @@ void C_board::Game_init() {
 		}
 	}
 	Special_brick = Brick_shape_list.Get_shape().Rotate(random(4));
-	for (Temp1 = 0; Temp1 < Special_brick.Get_X_size(); Temp1++) {
-		for (Temp2 = 0; Temp2 < Special_brick.Get_Y_size(); Temp2++) {
+	for (Temp1 = 0; Temp1 < (int)Special_brick.Get_X_size(); Temp1++) {
+		for (Temp2 = 0; Temp2 < (int)Special_brick.Get_Y_size(); Temp2++) {
 			if (Special_brick.Read(Temp1, Temp2)) {
 				Board[Temp2][BOARD_SIZE / 2 + Temp1].Health = 4;
 				Board[Temp2][BOARD_SIZE / 2 + Temp1].ID = 2;
@@ -419,8 +419,8 @@ void C_board::Game_init() {
 		}
 	}
 	Special_brick = Brick_shape_list.Get_shape().Rotate(random(4));
-	for (Temp1 = 0; Temp1 < Special_brick.Get_X_size(); Temp1++) {
-		for (Temp2 = 0; Temp2 < Special_brick.Get_Y_size(); Temp2++) {
+	for (Temp1 = 0; Temp1 < (int)Special_brick.Get_X_size(); Temp1++) {
+		for (Temp2 = 0; Temp2 < (int)Special_brick.Get_Y_size(); Temp2++) {
 			if (Special_brick.Read(Temp1, Temp2)) {
 				Board[BOARD_SIZE - 1 - Temp2][BOARD_SIZE / 2 + Temp1].Health = 3;
 				Board[BOARD_SIZE - 1 - Temp2][BOARD_SIZE / 2 + Temp1].ID = 3;
@@ -428,6 +428,7 @@ void C_board::Game_init() {
 			}
 		}
 	}
+	Brick_add_wall(T_direction::L);
 	//블럭이 나오는 시간 관련 초기화.
 	Playbrick_speed_tick = PLAYBRICK_SPEED_TICK_START;
 	Playbrick_tick = 1;
@@ -957,7 +958,7 @@ void C_board::Gamestop() {
 				}
 			}
 			else {
-				while (_kbhit()) { _getch(); }//키보드 버퍼 리셋.
+				//while (_kbhit()) { _getch(); }//키보드 버퍼 리셋.
 			}
 		}
 	}

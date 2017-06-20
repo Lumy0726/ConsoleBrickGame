@@ -1,12 +1,12 @@
 #ifndef KEYBOARD_HED
 #define KEYBOARD_HED
 
-class C_keyboard{
+class C_keyboard {
 protected:
 	static bool Key_state[];
 
 public:
-	enum Key_code{
+	enum Key_code {
 		LMOUSE = 0,
 		RMOUSE,
 		BACKSPACE,
