@@ -85,7 +85,7 @@ unsigned C_brick_shape::Get_X_size()const {
 unsigned C_brick_shape::Get_Y_size()const {
 	return Y_size;
 }
-void C_brick_shape::Rotate(unsigned Num) {
+C_brick_shape& C_brick_shape::Rotate(unsigned Num) {
 	C_brick_shape Temp(Y_size, X_size);
 	unsigned Loop1, Loop2;
 	for (Loop1 = 0; Loop1 < Y_size; Loop1++) {
@@ -93,7 +93,7 @@ void C_brick_shape::Rotate(unsigned Num) {
 			Temp.Access(Y_size - 1 - Loop1, Loop2) = Read(Loop2, Loop1);
 		}
 	}
-	*this = Temp;
+	return *this = Temp;
 }
 
 C_brick_shape_list::C_brick_shape_list() :Brick_shape_num(18){
@@ -285,3 +285,7 @@ C_brick_shape C_brick_shape_list::operator[](unsigned Input)const {
 		return C_brick_shape();
 	}
 }
+
+const C_brick_shape_list Brick_shape_list;
+
+//verge

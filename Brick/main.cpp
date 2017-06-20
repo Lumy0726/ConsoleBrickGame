@@ -371,6 +371,7 @@ void C_board::Screen_init() {
 }
 void C_board::Game_init() {
 	int Temp1, Temp2, Vector_num;
+	C_brick_shape Special_brick;
 	C_time Time;
 
 	Level = 1; Score = 0, Play_brick_way = U, Levelup_tick = 1, Boost_on = false, Boost_block_tick = 0;
@@ -382,7 +383,7 @@ void C_board::Game_init() {
 			if ((int(BRICK_HEIGHT) <= Temp1&&Temp1 < int(BOARD_SIZE - BRICK_HEIGHT)) ^
 				(int(BRICK_HEIGHT) <= Temp2&&Temp2 < int(BOARD_SIZE - BRICK_HEIGHT))) {
 				Brick_delete(Temp2, Temp1);
-				Brick_add(Temp2, Temp1);
+				if (Temp2) Brick_add(Temp2, Temp1);
 			}
 			else if ((int(BRICK_HEIGHT) <= Temp1&&Temp1 < int(BOARD_SIZE - BRICK_HEIGHT)) &&
 				(int(BRICK_HEIGHT) <= Temp2&&Temp2 < int(BOARD_SIZE - BRICK_HEIGHT))) {
@@ -390,12 +391,47 @@ void C_board::Game_init() {
 			}
 		}
 	}
+	//공을 생성하는 블럭.
 	Board[BRICK_HEIGHT][BRICK_HEIGHT - 1].State = C_brick::BALLOUT;
 	Board[BOARD_SIZE - BRICK_HEIGHT - 1][BOARD_SIZE - BRICK_HEIGHT].State = C_brick::BALLOUT;
 	Board[BRICK_HEIGHT][BRICK_HEIGHT - 1].Health = 2;
 	Board[BOARD_SIZE - BRICK_HEIGHT - 1][BOARD_SIZE - BRICK_HEIGHT].Health = 2;
+	//일부 특수블럭 생성.
+	Brick_add_wall(T_direction::L);
+	Special_brick = Brick_shape_list.Get_shape().Rotate(random(4));
+	for (Temp1 = 0; Temp1 < Special_brick.Get_X_size(); Temp1++) {
+		for (Temp2 = 0; Temp2 < Special_brick.Get_Y_size(); Temp2++) {
+			if (Special_brick.Read(Temp1, Temp2)) {
+				Board[BOARD_SIZE / 2 - Temp2][BOARD_SIZE - 1 - Temp1].Health = 5;
+				Board[BOARD_SIZE / 2 - Temp2][BOARD_SIZE - 1 - Temp1].ID = 1;
+				Board[BOARD_SIZE / 2 - Temp2][BOARD_SIZE - 1 - Temp1].State=C_brick::Brick_state::NORMAL_LARGE;
+			}
+		}
+	}
+	Special_brick = Brick_shape_list.Get_shape().Rotate(random(4));
+	for (Temp1 = 0; Temp1 < Special_brick.Get_X_size(); Temp1++) {
+		for (Temp2 = 0; Temp2 < Special_brick.Get_Y_size(); Temp2++) {
+			if (Special_brick.Read(Temp1, Temp2)) {
+				Board[Temp2][BOARD_SIZE / 2 + Temp1].Health = 4;
+				Board[Temp2][BOARD_SIZE / 2 + Temp1].ID = 2;
+				Board[Temp2][BOARD_SIZE / 2 + Temp1].State = C_brick::Brick_state::NORMAL_LARGE;
+			}
+		}
+	}
+	Special_brick = Brick_shape_list.Get_shape().Rotate(random(4));
+	for (Temp1 = 0; Temp1 < Special_brick.Get_X_size(); Temp1++) {
+		for (Temp2 = 0; Temp2 < Special_brick.Get_Y_size(); Temp2++) {
+			if (Special_brick.Read(Temp1, Temp2)) {
+				Board[BOARD_SIZE - 1 - Temp2][BOARD_SIZE / 2 + Temp1].Health = 3;
+				Board[BOARD_SIZE - 1 - Temp2][BOARD_SIZE / 2 + Temp1].ID = 3;
+				Board[BOARD_SIZE - 1 - Temp2][BOARD_SIZE / 2 + Temp1].State = C_brick::Brick_state::NORMAL_LARGE;
+			}
+		}
+	}
+	//블럭이 나오는 시간 관련 초기화.
 	Playbrick_speed_tick = PLAYBRICK_SPEED_TICK_START;
 	Playbrick_tick = 1;
+	//Board초기화 종료.
 	//Reflector 초기화.
 	Reflector.X = Reflector.Y = FLOOR(BOARD_SIZE_IN / 2, INTERNAL_RESOLUTION) + INTERNAL_RESOLUTION / 2;
 	Reflector.Move_length = 3;

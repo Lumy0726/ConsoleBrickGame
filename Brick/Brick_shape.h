@@ -13,7 +13,7 @@ public:
 	bool Read(unsigned X, unsigned Y)const;
 	unsigned Get_X_size()const;
 	unsigned Get_Y_size()const;
-	void Rotate(unsigned Num);
+	C_brick_shape& Rotate(unsigned Num);
 };
 
 class C_brick_shape_list {
@@ -30,4 +30,6 @@ public:
 	C_brick_shape operator[](unsigned Input)const;
 };
 
-const C_brick_shape_list Brick_shape_list;
+extern const C_brick_shape_list Brick_shape_list;
+
+//verge
